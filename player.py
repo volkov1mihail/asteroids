@@ -1,21 +1,15 @@
 import pygame
-from circleshape import CircleShape
-from constants import (PLAYER_RADIUS, LINE_WIDTH, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN_SECONDS,
+from constants import (PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, PLAYER_SHOOT_SPEED, PLAYER_SHOOT_COOLDOWN_SECONDS,
                        INITIAL_PLAYER_X, INITIAL_PLAYER_Y, ASTEROID_MIN_RADIUS, ASTEROID_MAX_REWARD, ASTEROID_REWARD_DIFF)
 from shot import Shot
-from triangle import triangle
+from triangleshape import TriangleShape
 
-class Player(CircleShape):
+class Player(TriangleShape):
     def __init__(self, x: float, y: float) -> None:
-        super().__init__(x, y, PLAYER_RADIUS)
-        self.rotation = 0
+        super().__init__(x, y, 0, PLAYER_RADIUS)
         self.shoot_timer = 0
         self.score:int = 0
         self.num_lives = 3
-
-    # in the Player class
-    def draw(self, screen: pygame.Surface) -> None:
-        pygame.draw.polygon(screen, "white", triangle(self.position, self.rotation, self.radius), LINE_WIDTH)
 
     def rotate(self, dt: float) -> None:
         self.rotation += PLAYER_TURN_SPEED * dt

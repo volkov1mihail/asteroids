@@ -1,4 +1,5 @@
 import pygame
+from triangleshape import TriangleShape
 
 
 # Base class for game objects
@@ -24,6 +25,33 @@ class CircleShape(pygame.sprite.Sprite):
         # must override
         pass
 
-    def collides_with(self, other) -> bool:
-        distance = self.position.distance_to(other.position)
-        return distance <= self.radius + other.radius
+    def collides_with_circle(self, circle: "CircleShape") -> bool:
+        distance = self.position.distance_to(circle.position)
+        return distance <= self.radius + circle.radius
+
+    def collides_with_triangle(self, triangle: TriangleShape) -> bool:
+        a, b, c = triangle.get_points()
+        sides = ((a, b), (b, c), (c, a))
+        for side in sides:
+            if self.collides_with_line_segment(side[0], side[1]):
+                return True
+        return False
+
+    def distance_to_line(self, a: pygame.Vector2, b: pygame.Vector2) -> float:
+        ab = b - a
+        normal = pygame.Vector2(-ab[1], ab[0]).normalize()
+        ao = self.position - a
+        return abs(normal.dot(ao))
+
+    def collides_with_line_segment(self, a: pygame.Vector2, b: pygame.Vector2) -> bool:
+        if (self.position.distance_to(a) <= self.radius
+           or self.position.distance_to(b) <= self.radius):
+            return True
+        if self.distance_to_line(a, b) > self.radius:
+            return False
+        
+        ab = b - a
+        ao = self.position - a
+        bo = self.position - b
+        if ao.dot(ab) * bo.dot(ab) < 0:
+            return True

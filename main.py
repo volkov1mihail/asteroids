@@ -7,7 +7,7 @@ from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
-from triangle import Triangle
+from triangleshape import TriangleShape
 
 def main():
     pygame.init()
@@ -21,6 +21,13 @@ def main():
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
 
+    score_font = pygame.font.Font(SCORE_FONT_PATH, SCORE_FONT_SIZE)
+    lives_font = pygame.font.Font(LIVES_FONT_PATH, LIVES_FONT_SIZE)
+    text_height = score_font.get_height()
+    lives_center_y = text_height + LIVES_SHIFT_Y
+    TriangleShape.containers = (updatable, drawable)
+    lives_symbol = TriangleShape(LIVES_CENTER_X_COORD, lives_center_y, LIVES_ROTATION, LIVES_RADIUS)
+
     Player.containers = (updatable, drawable)
     player = Player(INITIAL_PLAYER_X, INITIAL_PLAYER_Y)
     Shot.containers = (shots, updatable, drawable)
@@ -28,13 +35,6 @@ def main():
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
     asteroid_field = AsteroidField()
-
-    score_font = pygame.font.Font(SCORE_FONT_PATH, SCORE_FONT_SIZE)
-    lives_font = pygame.font.Font(LIVES_FONT_PATH, LIVES_FONT_SIZE)
-    text_height = score_font.get_height()
-    lives_center_y = text_height + LIVES_SHIFT_Y
-    Triangle.containers = (updatable, drawable)
-    lives_symbol = Triangle(LIVES_CENTER_X_COORD, lives_center_y, LIVES_ROTATION, LIVES_RADIUS)
 
     while(True):
         log_state()
@@ -59,13 +59,13 @@ def main():
 
         updatable.update(dt)
         for asteroid in asteroids:
-            if asteroid.collides_with(player):
+            if asteroid.collides_with_triangle(player):
                 log_event("player_hit")
                 player.loose_life()
                 asteroid.split()
 
             for shot in shots:
-                if asteroid.collides_with(shot):
+                if asteroid.collides_with_circle(shot):
                     log_event("asteroid_shot")
                     player.add_score(asteroid.radius)
                     asteroid.split()
